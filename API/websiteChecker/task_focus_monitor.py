@@ -232,6 +232,68 @@ class TaskFocusMonitor:
         print(f"相关网站: {relevant} ({relevant/total*100:.1f}%)")
         print(f"无关网站: {irrelevant} ({irrelevant/total*100:.1f}%)")
         print("=" * 70 + "\n")
+    
+    def check_from_flowstate(self, task_data, website_data):
+        """
+        从 FlowState 数据检查网站相关性
+        
+        参数:
+            task_data: FlowState 任务数据
+            website_data: FlowState 网站数据
+        
+        返回:
+            dict: 检查结果
+        """
+        if not task_data or not website_data:
+            return {
+                "is_relevant": False,
+                "action": "error",
+                "reason": "FlowState 数据不完整",
+                "confidence": "none"
+            }
+        
+        # 构建任务描述
+        task_name = task_data.get('name', '未知任务')
+        resources = task_data.get('resources', [])
+        
+        # 构建任务描述，包含相关资源信息
+        task_description = f"任务: {task_name}"
+        if resources:
+            resource_descriptions = []
+            for resource in resources[:5]:  # 只取前5个资源
+                if resource.get("kind") == "url":
+                    url = resource.get("id", "")
+                    title = resource.get("title", "")
+                    if title:
+                        resource_descriptions.append(f"{title} ({url})")
+                    else:
+                        resource_descriptions.append(url)
+                elif resource.get("kind") == "app":
+                    app_id = resource.get("id", "")
+                    title = resource.get("title", "")
+                    if title:
+                        resource_descriptions.append(f"{title} ({app_id})")
+                    else:
+                        resource_descriptions.append(app_id)
+            
+            if resource_descriptions:
+                task_description += f"\n相关资源: {', '.join(resource_descriptions)}"
+        
+        # 设置任务
+        self.set_task(task_description)
+        
+        # 获取网站信息
+        website_url = website_data.get('url', '')
+        website_title = website_data.get('title', '')
+        app_id = website_data.get('app_id', '')
+        
+        # 构建网站描述
+        website_description = website_title if website_title else ""
+        if app_id and app_id != "browser":
+            website_description += f" (应用: {app_id})"
+        
+        # 检查网站
+        return self.check_website(website_url, website_description if website_description else None)
 
 
 def main():
