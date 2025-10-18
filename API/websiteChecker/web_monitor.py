@@ -3,7 +3,12 @@ Web界面版任务专注度监控 - 使用 Flask
 提供简单的Web界面进行任务设置和网站检查
 """
 
+import os
 from flask import Flask, render_template_string, request, jsonify
+
+# 硬编码 GROQ API Key（按你的要求）
+os.environ["GROQ_API_KEY"] = "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"
+
 from task_focus_monitor import TaskFocusMonitor
 
 app = Flask(__name__)
@@ -370,7 +375,7 @@ HTML_TEMPLATE = """
 </body>
 </html>
 """
-
+ 
 
 @app.route('/')
 def index():
@@ -411,4 +416,3 @@ if __name__ == '__main__':
     print("\n按 Ctrl+C 停止服务器\n")
     
     app.run(debug=True, host='0.0.0.0', port=5000)
-
