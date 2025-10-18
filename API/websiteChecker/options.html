@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <title>FlowState 扩展设置</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 20px; }
+      label { display: block; margin: 12px 0 6px; font-weight: 600; }
+      input[type="text"] { width: 480px; max-width: 100%; padding: 8px; }
+      .row { margin: 10px 0; }
+      button { padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>FlowState 扩展设置</h1>
+    <div class="row">
+      <label for="endpoint">后端地址（/classify_website）</label>
+      <input id="endpoint" type="text" placeholder="http://localhost:5001/classify_website" />
+    </div>
+    <div class="row">
+      <label><input id="showBanner" type="checkbox" /> 页面顶部显示提示条</label>
+    </div>
+    <div class="row">
+      <label><input id="autoClose" type="checkbox" /> 自动关闭/跳转无关页面</label>
+    </div>
+    <div class="row">
+      <button id="saveBtn">保存</button>
+      <span id="status" style="margin-left:10px;"></span>
+    </div>
+
+    <script>
+      const DEFAULTS = {
+        endpoint: "http://localhost:5001/classify_website",
+        showBanner: true,
+        autoClose: false
+      };
+
+      function load() {
+        chrome.storage.sync.get(DEFAULTS, (cfg) => {
+          document.getElementById("endpoint").value = cfg.endpoint;
+          document.getElementById("showBanner").checked = !!cfg.showBanner;
+          document.getElementById("autoClose").checked = !!cfg.autoClose;
+        });
+      }
+
+      function save() {
+        const cfg = {
+          endpoint: document.getElementById("endpoint").value.trim() || DEFAULTS.endpoint,
+          showBanner: document.getElementById("showBanner").checked,
+          autoClose: document.getElementById("autoClose").checked
+        };
+        chrome.storage.sync.set(cfg, () => {
+          const s = document.getElementById("status");
+          s.textContent = "已保存";
+          setTimeout(() => s.textContent = "", 1500);
+        });
+      }
+
+      document.getElementById("saveBtn").addEventListener("click", save);
+      document.addEventListener("DOMContentLoaded", load);
+    </script>
+  </body>
+</html>
