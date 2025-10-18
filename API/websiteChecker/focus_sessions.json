@@ -1,0 +1,87 @@
+{
+  "sessions": [
+    {
+      "session_id": "session_1760793460_0",
+      "task_id": "test_task_002",
+      "task_name": "测试增强监控",
+      "start_time": 1760793460.7223492,
+      "end_time": 1760793462.5015013,
+      "total_duration": 1.7791521549224854,
+      "relevant_websites": 0,
+      "irrelevant_websites": 3,
+      "focus_score": 0.0,
+      "website_checks": [
+        {
+          "timestamp": "2025-10-18T13:17:40.911854",
+          "website_url": "https://github.com/user/repo",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        },
+        {
+          "timestamp": "2025-10-18T13:17:41.457457",
+          "website_url": "https://www.youtube.com/watch?v=123",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        },
+        {
+          "timestamp": "2025-10-18T13:17:42.001287",
+          "website_url": "https://stackoverflow.com/questions/123456",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        }
+      ]
+    },
+    {
+      "session_id": "session_1760793514_1",
+      "task_id": "demo_task_002",
+      "task_name": "写技术文档",
+      "start_time": 1760793514.9556673,
+      "end_time": 1760793520.3859825,
+      "total_duration": 5.430315256118774,
+      "relevant_websites": 0,
+      "irrelevant_websites": 5,
+      "focus_score": 0.0,
+      "website_checks": [
+        {
+          "timestamp": "2025-10-18T13:18:35.133407",
+          "website_url": "https://stackoverflow.com/questions/123456",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        },
+        {
+          "timestamp": "2025-10-18T13:18:36.187549",
+          "website_url": "https://docs.google.com/document/d/123",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        },
+        {
+          "timestamp": "2025-10-18T13:18:37.233722",
+          "website_url": "https://www.youtube.com/watch?v=123",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        },
+        {
+          "timestamp": "2025-10-18T13:18:38.285956",
+          "website_url": "https://www.youtube.com/watch?v=123",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        },
+        {
+          "timestamp": "2025-10-18T13:18:39.340765",
+          "website_url": "https://www.youtube.com/watch?v=123",
+          "is_relevant": false,
+          "confidence": "low",
+          "reason": "AI分析失败: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}"
+        }
+      ]
+    }
+  ],
+  "last_updated": "2025-10-18T13:18:40.386112"
+}
