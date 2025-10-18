@@ -39,3 +39,6 @@ server  实现了  （若无注入API高级判断）朴素关键词判断前台�
 实现了利用groq api进行website checking 的功能；
 
 下一步改进输入方式，input为读取从浏览器打开的网页，output对应关闭网页的操作
+
+// yongxi
+获得网址后，给到API文件中，判断是否正在专注
