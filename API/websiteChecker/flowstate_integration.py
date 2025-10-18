@@ -4,12 +4,16 @@ FlowState 集成脚本
 实时监控 FlowState 任务和网站，使用 TaskFocusMonitor 进行专注度分析
 """
 
+import os
 import time
 import json
 import signal
 import sys
 from datetime import datetime
 from pathlib import Path
+
+# 硬编码 GROQ API Key（按你的要求）
+os.environ["GROQ_API_KEY"] = "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"
 
 # 导入我们的模块
 from flowstate_bridge import FlowStateBridge
