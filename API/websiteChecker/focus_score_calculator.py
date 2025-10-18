@@ -5,24 +5,23 @@
 
 import json
 import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict
 
 
 @dataclass
 class FocusSession:
-    """专注会话数据"""
     session_id: str
     task_id: str
     task_name: str
     start_time: float
     end_time: Optional[float] = None
-    total_duration: float = 0.0  # 总时长（秒）
-    relevant_websites: int = 0  # 相关网站访问次数
-    irrelevant_websites: int = 0  # 无关网站访问次数
-    focus_score: float = 0.0  # 专注度分数 (0-100)
-    website_checks: List[Dict] = None  # 网站检查记录
+    total_duration: float = 0.0
+    relevant_websites: int = 0
+    irrelevant_websites: int = 0
+    focus_score: float = 0.0
+    website_checks: List[Dict] = None
     
     def __post_init__(self):
         if self.website_checks is None:
@@ -31,34 +30,24 @@ class FocusSession:
 
 @dataclass
 class FocusMetrics:
-    """专注度指标"""
     total_sessions: int = 0
-    total_focus_time: float = 0.0  # 总专注时间（秒）
+    total_focus_time: float = 0.0
     average_focus_score: float = 0.0
     best_focus_score: float = 0.0
     worst_focus_score: float = 100.0
     total_relevant_websites: int = 0
     total_irrelevant_websites: int = 0
-    focus_efficiency: float = 0.0  # 专注效率 = 相关网站 / 总网站
+    focus_efficiency: float = 0.0
 
 
 class FocusScoreCalculator:
-    """专注度计算器"""
-    
     def __init__(self, data_file: str = "focus_sessions.json"):
-        """
-        初始化专注度计算器
-        
-        参数:
-            data_file: 数据存储文件路径
-        """
         self.data_file = data_file
         self.sessions: List[FocusSession] = []
         self.current_session: Optional[FocusSession] = None
         self.load_data()
     
     def load_data(self):
-        """从文件加载数据"""
         try:
             with open(self.data_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -73,7 +62,6 @@ class FocusScoreCalculator:
             self.sessions = []
     
     def save_data(self):
-        """保存数据到文件"""
         try:
             data = {
                 'sessions': [asdict(session) for session in self.sessions],
@@ -85,16 +73,6 @@ class FocusScoreCalculator:
             print(f"保存数据失败: {e}")
     
     def start_session(self, task_id: str, task_name: str) -> str:
-        """
-        开始专注会话
-        
-        参数:
-            task_id: 任务ID
-            task_name: 任务名称
-            
-        返回:
-            str: 会话ID
-        """
         session_id = f"session_{int(time.time())}_{len(self.sessions)}"
         
         self.current_session = FocusSession(
@@ -109,37 +87,26 @@ class FocusScoreCalculator:
         return session_id
     
     def end_session(self) -> Optional[FocusSession]:
-        """
-        结束当前专注会话
-        
-        返回:
-            FocusSession: 结束的会话数据，如果没有活跃会话则返回None
-        """
         if not self.current_session:
             print("❌ 没有活跃的专注会话")
             return None
         
-        # 计算会话时长
         self.current_session.end_time = time.time()
         self.current_session.total_duration = (
             self.current_session.end_time - self.current_session.start_time
         )
         
-        # 计算专注度分数
         self.current_session.focus_score = self._calculate_focus_score(
             self.current_session.total_duration,
             self.current_session.relevant_websites,
             self.current_session.irrelevant_websites
         )
         
-        # 保存会话
         self.sessions.append(self.current_session)
         self.save_data()
         
-        # 打印会话总结
         self._print_session_summary(self.current_session)
         
-        # 清除当前会话
         ended_session = self.current_session
         self.current_session = None
         
@@ -147,20 +114,10 @@ class FocusScoreCalculator:
     
     def record_website_check(self, website_url: str, is_relevant: bool, 
                            confidence: str = "medium", reason: str = ""):
-        """
-        记录网站检查结果
-        
-        参数:
-            website_url: 网站URL
-            is_relevant: 是否与任务相关
-            confidence: 置信度 (high/medium/low)
-            reason: 判断理由
-        """
         if not self.current_session:
             print("❌ 没有活跃的专注会话，无法记录网站检查")
             return
         
-        # 记录网站检查
         check_record = {
             "timestamp": datetime.now().isoformat(),
             "website_url": website_url,
@@ -171,13 +128,11 @@ class FocusScoreCalculator:
         
         self.current_session.website_checks.append(check_record)
         
-        # 更新统计
         if is_relevant:
             self.current_session.relevant_websites += 1
         else:
             self.current_session.irrelevant_websites += 1
         
-        # 实时更新专注度分数
         self.current_session.focus_score = self._calculate_focus_score(
             self.current_session.total_duration,
             self.current_session.relevant_websites,
@@ -189,43 +144,25 @@ class FocusScoreCalculator:
         print(f"   当前专注度: {self.current_session.focus_score:.1f}")
     
     def _calculate_focus_score(self, duration: float, relevant: int, irrelevant: int) -> float:
-        """
-        计算专注度分数
-        
-        参数:
-            duration: 专注时长（秒）
-            relevant: 相关网站访问次数
-            irrelevant: 无关网站访问次数
-            
-        返回:
-            float: 专注度分数 (0-100)
-        """
         if duration <= 0:
             return 0.0
         
-        # 基础分数：基于时长（最多40分）
-        duration_score = min(40.0, duration / 60.0 * 2)  # 每分钟2分，最多40分
+        duration_score = min(40.0, duration / 60.0 * 2)
         
-        # 效率分数：基于网站访问质量（最多60分）
         total_websites = relevant + irrelevant
         if total_websites == 0:
-            efficiency_score = 60.0  # 没有访问网站，给满分
+            efficiency_score = 60.0
         else:
             relevance_ratio = relevant / total_websites
-            # 相关网站比例越高，分数越高
             efficiency_score = relevance_ratio * 60.0
         
-        # 分心惩罚：无关网站访问次数越多，扣分越多
-        distraction_penalty = min(20.0, irrelevant * 2)  # 每个无关网站扣2分，最多扣20分
+        distraction_penalty = min(20.0, irrelevant * 2)
         
-        # 计算最终分数
         final_score = duration_score + efficiency_score - distraction_penalty
         
-        # 确保分数在0-100范围内
         return max(0.0, min(100.0, final_score))
     
     def _print_session_summary(self, session: FocusSession):
-        """打印会话总结"""
         duration_minutes = session.total_duration / 60.0
         
         print("\n" + "=" * 70)
@@ -237,7 +174,6 @@ class FocusScoreCalculator:
         print(f"无关网站: {session.irrelevant_websites} 次")
         print(f"专注度分数: {session.focus_score:.1f}/100")
         
-        # 分数评级
         if session.focus_score >= 90:
             grade = "🌟 优秀"
         elif session.focus_score >= 80:
@@ -253,7 +189,6 @@ class FocusScoreCalculator:
         print("=" * 70 + "\n")
     
     def get_current_session_info(self) -> Optional[Dict]:
-        """获取当前会话信息"""
         if not self.current_session:
             return None
         
@@ -269,18 +204,8 @@ class FocusScoreCalculator:
         }
     
     def get_focus_metrics(self, days: int = 30) -> FocusMetrics:
-        """
-        获取专注度指标
-        
-        参数:
-            days: 统计天数
-            
-        返回:
-            FocusMetrics: 专注度指标
-        """
         cutoff_time = time.time() - (days * 24 * 60 * 60)
         
-        # 过滤指定天数内的会话
         recent_sessions = [
             s for s in self.sessions 
             if s.start_time >= cutoff_time and s.end_time is not None
@@ -308,7 +233,6 @@ class FocusScoreCalculator:
         )
     
     def print_focus_metrics(self, days: int = 30):
-        """打印专注度指标"""
         metrics = self.get_focus_metrics(days)
         
         print("\n" + "=" * 70)
@@ -325,16 +249,6 @@ class FocusScoreCalculator:
         print("=" * 70 + "\n")
     
     def get_session_history(self, limit: int = 10) -> List[Dict]:
-        """
-        获取会话历史记录
-        
-        参数:
-            limit: 返回记录数量限制
-            
-        返回:
-            List[Dict]: 会话历史记录
-        """
-        # 按开始时间倒序排列
         sorted_sessions = sorted(
             [s for s in self.sessions if s.end_time is not None],
             key=lambda x: x.start_time,
@@ -356,19 +270,15 @@ class FocusScoreCalculator:
 
 
 def main():
-    """主函数 - 演示专注度计算器功能"""
     print("=" * 70)
     print("专注度计算器演示")
     print("=" * 70)
     
-    # 创建计算器实例
     calculator = FocusScoreCalculator()
     
-    # 模拟一个专注会话
     print("1. 开始专注会话...")
     session_id = calculator.start_session("task_001", "学习Python编程")
     
-    # 模拟一些网站访问
     print("\n2. 模拟网站访问...")
     test_websites = [
         ("https://docs.python.org", True, "high", "官方文档，与学习相关"),
@@ -381,21 +291,17 @@ def main():
     
     for url, is_relevant, confidence, reason in test_websites:
         calculator.record_website_check(url, is_relevant, confidence, reason)
-        time.sleep(0.5)  # 模拟时间间隔
+        time.sleep(0.5)
     
-    # 模拟专注时长
     print(f"\n3. 模拟专注时长...")
-    time.sleep(2)  # 模拟2秒专注时间
+    time.sleep(2)
     
-    # 结束会话
     print("\n4. 结束专注会话...")
     ended_session = calculator.end_session()
     
-    # 显示统计信息
     print("\n5. 显示专注度统计...")
     calculator.print_focus_metrics()
     
-    # 显示会话历史
     print("\n6. 会话历史记录...")
     history = calculator.get_session_history(5)
     for session in history:

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 专注度监控CLI工具
-提供简单的命令行界面来管理专注度监控
 """
 
 import sys
@@ -11,31 +10,22 @@ from enhanced_focus_monitor import EnhancedFocusMonitor
 
 
 def main():
-    """主函数"""
     parser = argparse.ArgumentParser(description="专注度监控CLI工具")
     subparsers = parser.add_subparsers(dest='command', help='可用命令')
     
-    # 开始监控命令
     start_parser = subparsers.add_parser('start', help='开始专注度监控')
     start_parser.add_argument('--task-id', help='任务ID')
     start_parser.add_argument('--task-name', help='任务名称')
     start_parser.add_argument('--auto', action='store_true', help='自动从FlowState获取任务')
     
-    # 检查网站命令
     check_parser = subparsers.add_parser('check', help='检查当前网站')
-    
-    # 结束监控命令
     end_parser = subparsers.add_parser('end', help='结束专注度监控')
-    
-    # 状态命令
     status_parser = subparsers.add_parser('status', help='查看当前状态')
     
-    # 历史记录命令
     history_parser = subparsers.add_parser('history', help='查看专注度历史')
     history_parser.add_argument('--days', type=int, default=30, help='查看天数')
     history_parser.add_argument('--limit', type=int, default=10, help='显示记录数量')
     
-    # 统计命令
     stats_parser = subparsers.add_parser('stats', help='查看专注度统计')
     stats_parser.add_argument('--days', type=int, default=30, help='统计天数')
     
@@ -45,20 +35,17 @@ def main():
         parser.print_help()
         return
     
-    # 创建监控器实例
     monitor = EnhancedFocusMonitor()
     
     try:
         if args.command == 'start':
             if args.auto:
-                # 自动从FlowState获取任务
                 success = monitor.start_task_monitoring()
                 if success:
                     print("✅ 专注度监控已开始")
                 else:
                     print("❌ 启动监控失败")
             else:
-                # 手动指定任务
                 if not args.task_name:
                     print("❌ 请提供任务名称 (--task-name)")
                     return
