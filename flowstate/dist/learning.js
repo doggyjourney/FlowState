@@ -40,11 +40,13 @@ export class LearningSession {
     sys;
     stop;
     seen = new Map();
+    startTime;
     constructor(sys) {
         this.sys = sys;
     }
     start() {
         this.stop?.();
+        this.startTime = Date.now();
         this.stop = this.sys.subscribeActiveWindow((e) => {
             this.see({ kind: 'app', id: e.appId, title: e.title });
             if (e.url)
@@ -59,6 +61,12 @@ export class LearningSession {
         this.stop?.();
         this.stop = undefined;
         return Array.from(this.seen.values());
+    }
+    getDuration() {
+        return this.startTime ? Date.now() - this.startTime : 0;
+    }
+    getResourceCount() {
+        return this.seen.size;
     }
 }
 export async function launchResources(resources, sys) {
