@@ -11,13 +11,15 @@ from groq import Groq
 from focus_score_calculator import FocusScoreCalculator
 from flowstate_bridge import FlowStateBridge
 
+# 硬编码 GROQ API Key（按你的要求）
+GROQ_HARDCODED_KEY = "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"
+os.environ["GROQ_API_KEY"] = GROQ_HARDCODED_KEY
+
 
 class EnhancedFocusMonitor:
     def __init__(self, api_key=None, flowstate_path=None):
-        if api_key:
-            self.client = Groq(api_key=api_key)
-        else:
-            self.client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+        # 忽略传入的 api_key，统一使用硬编码的密钥
+        self.client = Groq(api_key=GROQ_HARDCODED_KEY)
         
         self.focus_calculator = FocusScoreCalculator()
         self.flowstate_bridge = FlowStateBridge(flowstate_path)
