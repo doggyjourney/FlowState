@@ -45,3 +45,5 @@ server  实现了  （若无注入API高级判断）朴素关键词判断前台�
 目前正在测试API与网站记录的连接 by XYavecasdf
 
 下一步，通过API里的判断，记录任务开始到任务结束时间，共打开多少次无关网站，以此生成专注力报告
+
+// XYavecasdf: hardcoded all the API's
