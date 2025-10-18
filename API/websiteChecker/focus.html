@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <title>保持专注</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #fafafa; color: #222; }
+      .card { max-width: 760px; margin: 10vh auto; background: white; padding: 28px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+      h1 { margin: 0 0 10px; }
+      .muted { color: #666; }
+      .meta { margin-top: 14px; background: #f3f4f6; padding: 12px; border-radius: 8px; font-size: 13px; word-break: break-all; }
+      .btns { margin-top: 18px; }
+      button { padding: 10px 16px; border-radius: 10px; border: 1px solid #ccc; cursor: pointer; margin-right: 10px; }
+      .primary { background: #e0f3e6; border-color: #3aa76d; color: #0d6832; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>这可能不是与你当前任务相关的页面</h1>
+      <div class="muted">让我们继续专注吧。</div>
+      <div class="meta" id="meta"></div>
+      <div class="btns">
+        <button class="primary" id="back">返回上一页</button>
+        <button id="open">我坚持要打开</button>
+      </div>
+    </div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const url = params.get("u") || "";
+      const title = params.get("t") || "";
+      const reason = params.get("r") || "";
+      document.getElementById("meta").textContent =
+        `URL: ${url}\n标题: ${title}\n理由: ${reason}`;
+      document.getElementById("back").addEventListener("click", () => history.back());
+      document.getElementById("open").addEventListener("click", () => {
+        if (url) location.href = url;
+      });
+    </script>
+  </body>
+</html>
