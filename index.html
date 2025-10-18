@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowState - Focus Mode Detector</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #667eea;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background: #e0e0e0;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      transition: all 0.3s;
+    }
+
+    .tab.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+      font-weight: 600;
+    }
+
+    .tab:hover {
+      background: #5568d3;
+      color: white;
+      border-color: #5568d3;
+    }
+
+    .content {
+      display: none;
+    }
+
+    .content.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: #667eea;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #555;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #5568d3;
+    }
+
+    button.danger {
+      background: #e74c3c;
+    }
+
+    button.danger:hover {
+      background: #c0392b;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .score-number {
+      font-size: 64px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .alert.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    .activity-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .activity-item.distraction {
+      background: #ffe5e5;
+      border-left: 4px solid #e74c3c;
+    }
+
+    .category-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .session-item {
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .session-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .session-score {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .task-app-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge.work {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge.distraction {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .badge.break {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    #scoreChart {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 40px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎯 FlowState - Focus Mode Detector</h1>
+      <p>Track your focus, block distractions, achieve more</p>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('home')">Home</button>
+        <button class="tab" onclick="switchTab('categories')">App Categories</button>
+        <button class="tab" onclick="switchTab('tasks')">Task Management</button>
+        <button class="tab" onclick="switchTab('history')">Session History</button>
+      </div>
+    </header>
+
+    <!-- Home Tab -->
+    <div id="home" class="content active">
+      <div class="grid">
+        <div>
+          <div class="card">
+            <h2>Start Focus Session</h2>
+            <input type="text" id="taskInput" placeholder="What are you working on? (e.g., Write Code)" />
+            <button id="startBtn" onclick="startSession()">Start Focus</button>
+            <button id="endBtn" onclick="endSession()" style="display:none; background:#e74c3c;">End Session</button>
+            <div id="sessionInfo" class="alert"></div>
+          </div>
+
+          <div class="score-display">
+            <div>Current Focus Score</div>
+            <div class="score-number" id="currentScore">60</div>
+            <div>Keep focused to increase your score!</div>
+          </div>
+
+          <div class="card">
+            <h2>This Week Stats</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-number" id="totalSessions">0</div>
+                <div class="stat-label">Sessions</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="avgScore">0</div>
+                <div class="stat-label">Avg Score</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="totalDistractions">0</div>
+                <div class="stat-label">Distractions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>Focus Score Chart</h2>
+            <canvas id="scoreChart"></canvas>
+          </div>
+
+          <div class="card">
+            <h2>Real-time Activities</h2>
+            <div id="activityList">
+              <p class="empty-state">Start a focus session to see activities</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App Categories Tab -->
+    <div id="categories" class="content">
+      <div class="grid">
+        <div class="card">
+          <h2>Add App Category</h2>
+          <p style="font-size:13px; color:#666; margin-bottom:12px;">
+            Tip: Start a session and switch to an app to see its exact name in Real-time Activities
+          </p>
+          <input type="text" id="appNameInput" placeholder="App Name (e.g., Google Chrome)" />
+          <select id="categorySelect">
+            <option value="work">Work</option>
+            <option value="distraction">Distraction</option>
+            <option value="break">Break</option>
+          </select>
+          <label class="checkbox-label">
+            <input type="checkbox" id="blockCheckbox" />
+            <span>Auto-close when detected (Distraction apps only)</span>
+          </label>
+          <button onclick="addCategory()">Add Category</button>
+        </div>
+
+        <div class="card">
+          <h2>Categorized Apps</h2>
+          <div id="categoryList">
+            <p class="empty-state">No apps categorized yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Management Tab -->
+    <div id="tasks" class="content">
+      <div class="grid">
+        <div class="card">
+          <h2>Associate Apps/URLs with Task</h2>
+          <input type="text" id="taskNameInput" placeholder="Task Name (e.g., Write Code)" />
+          <input type="text" id="taskAppInput" placeholder="App Name (e.g., Visual Studio Code)" />
+          <input type="text" id="taskUrlInput" placeholder="Or URL (e.g., https://github.com)" />
+          <button onclick="saveTaskApp()">Save Association</button>
+
+          <h3 style="margin-top:24px;">Quick Launch</h3>
+          <input type="text" id="launchTaskInput" placeholder="Task Name" />
+          <button onclick="launchTaskApps()">Launch All Apps/URLs</button>
+        </div>
+
+        <div class="card">
+          <h2>Task Associations</h2>
+          <div id="taskAppList">
+            <p class="empty-state">Enter a task name to see associations</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session History Tab -->
+    <div id="history" class="content">
+      <div class="card">
+        <h2>Session History</h2>
+        <div id="sessionList">
+          <p class="empty-state">No sessions yet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+  <script src="renderer-enhanced.js"></script>
+</body>
+</html>
+

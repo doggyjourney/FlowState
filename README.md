@@ -1,49 +1,82 @@
-## for cursor hackathon
-### divide into three part
-1. local (Smithery to control pc)
-2. brain (gemini to make judgement)
-3. frontend
+# FlowState v4.0 - AI-Powered Focus Detector (Final)
 
+## 🚀 What's New in v4.0
 
-## stage 1
-//yongxi
-TaskStore	✅ 实现了	任务的创建、保存到 ~/.flowstate/store.json、列表展示等。
-LearningSession	✅ 模拟实现	可以运行，会打印“学习会话开始/结束”，但不连接真实网站或模型。
-Launcher	🟡 模拟实现	只打印“正在启动任务…”的文字，还不会真正打开网站或应用。
-DevSystemController	🟡 模拟实现	用于开发调试阶段，可能通过 console.log 模拟“打开 VSCode / 浏览器”。
-CLI 命令	✅ 全部可运行	解析参数、调用对应逻辑、更新 store。
+### 🎯 Differential Penalty System
+- **AI Detection:** Warning popup (NOT force-closed), -5 points
+- **Manual Blacklist:** Force close app, -10 points
 
-当前版本的 CLI 使用的是 DevSystemController（开发用控制器）。
-它只是打印日志，不会真的操作系统或记录应用。
-未来需要你手动替换为真正的 SystemController 实现，才能让它：
+### 📊 Real-Time Scrolling Chart
+- Updates every 2 seconds
+- Shows last 60 seconds (30 points)
+- Scrolls left automatically
+- X-axis in seconds
 
-监控你访问的网站；
+### 🧹 Clean First Run
+- Removes all preset data
+- Fresh start every time
 
-启动浏览器或应用；
+### 📈 Improved Score Display
+- Shows last session score when not focusing
+- Clear status descriptions
 
-记录时间/活动。
+### ✅ All Bugs Fixed
+- Task deletion works
+- Chart scrolls correctly
+- Score display accurate
 
-### 任务管理
-- 创建，记录任务
-- 查看任务
-- 打开任务所需资源
+## 🔧 Installation
 
-~/.flowstate/web_log.txt 记录网站信息（验证日志功能是否正常）
+```bash
+npm install
+export GROQ_API_KEY="your_key"  # Optional
+npm start
+```
 
-//Xsasdes
-agent 实现了  超过60秒未发送或前台软件发生变化时，将检测导读前台应用软件发送给server；执行关闭软件的指令
-server  实现了  （若无注入API高级判断）朴素关键词判断前台应用是否属于黑名单
-        待实现  用注释标注待接入API（gemini/Groq）的地方以高级判断的标准
+## 🎯 Penalty System
 
-//XYavecasdf
-实现了利用groq api进行website checking 的功能；
+| Method | Action | Penalty | Popup |
+|--------|--------|---------|-------|
+| AI | Warning | -5 | Orange |
+| Blacklist | Force close | -10 | Red |
 
-下一步改进输入方式，input为读取从浏览器打开的网页，output对应关闭网页的操作
+## 📖 Quick Guide
 
-// yongxi
-获得网址后，给到API文件中，判断是否正在专注
-目前正在测试API与网站记录的连接 by XYavecasdf
+**Setup Blacklist:**
+1. App Categories → Enter app name
+2. Category: "Distraction"
+3. Check "Auto-close"
+4. Save
 
-下一步，通过API里的判断，记录任务开始到任务结束时间，共打开多少次无关网站，以此生成专注力报告
+**Use AI:**
+1. Set GROQ_API_KEY
+2. Start session with clear task
+3. AI detects automatically
 
-// XYavecasdf: hardcoded all the API's
+**Task Associations:**
+1. Task Management → Add
+2. Launch all when starting session
+
+## 📊 Chart Features
+
+- 2-second updates
+- 30-point window (60s)
+- Auto-scrolling
+- Real-time visualization
+
+## 🐛 Troubleshooting
+
+**AI not working?** Check GROQ_API_KEY
+
+**Apps not closing?** Verify exact app name
+
+**Chart not scrolling?** Wait 60+ seconds
+
+## 📄 License
+
+MIT
+
+---
+
+**v4.0 Final** | **Full English** | **Built-in AI** 🚀
+

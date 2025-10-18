@@ -1,0 +1,43 @@
+{
+  "name": "flowstate",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "FlowState - 跨平台专注模式检测器",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win"
+  },
+  "keywords": ["focus", "productivity", "time-tracking"],
+  "author": "FlowState Team",
+  "license": "MIT",
+  "build": {
+    "appId": "com.flowstate.app",
+    "productName": "FlowState",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "index.html"
+    ],
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    }
+  },
+  "dependencies": {
+    "groq-sdk": "^0.7.0"
+  },
+  "devDependencies": {
+    "electron": "^38.3.0",
+    "electron-builder": "^26.0.12"
+  }
+}
+
