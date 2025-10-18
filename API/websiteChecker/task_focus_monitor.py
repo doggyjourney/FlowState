@@ -5,8 +5,10 @@
 
 import os
 import json
+import time
 from datetime import datetime
 from groq import Groq
+from focus_score_calculator import FocusScoreCalculator
 
 
 class TaskFocusMonitor:
@@ -26,6 +28,8 @@ class TaskFocusMonitor:
         
         self.current_task = None
         self.check_history = []
+        self.focus_calculator = FocusScoreCalculator()
+        self.session_start_time = None
     
     def set_task(self, task_description):
         """
@@ -36,8 +40,15 @@ class TaskFocusMonitor:
         """
         self.current_task = task_description
         self.check_history = []
+        self.session_start_time = time.time()
+        
+        # 开始专注会话
+        task_id = f"task_{int(time.time())}"
+        self.focus_calculator.start_session(task_id, task_description)
+        
         print(f"\n✓ 已设置当前任务: {task_description}")
-        print(f"现在会监控打开的网站是否与此任务相关\n")
+        print(f"现在会监控打开的网站是否与此任务相关")
+        print(f"专注会话已开始，将记录您的专注时长和网站访问情况\n")
     
     def check_website(self, website_url, website_description=None):
         """
@@ -117,6 +128,14 @@ class TaskFocusMonitor:
                 "task": self.current_task,
                 "result": result
             })
+            
+            # 记录到专注度计算器
+            self.focus_calculator.record_website_check(
+                website_url=website_url,
+                is_relevant=result["is_relevant"],
+                confidence=result["confidence"],
+                reason=result["reason"]
+            )
             
             return result
             
@@ -214,6 +233,77 @@ class TaskFocusMonitor:
             }, f, ensure_ascii=False, indent=2)
         print(f"✓ 历史记录已保存到 {filename}")
     
+    def end_task(self):
+        """
+        结束当前任务并计算专注度
+        
+        返回:
+            dict: 任务结束后的专注度统计
+        """
+        if not self.current_task:
+            print("❌ 没有活跃的任务")
+            return None
+        
+        # 结束专注会话
+        ended_session = self.focus_calculator.end_session()
+        
+        if ended_session:
+            # 打印任务总结
+            print("\n" + "=" * 70)
+            print("🎯 任务完成总结")
+            print("=" * 70)
+            print(f"任务: {self.current_task}")
+            print(f"专注时长: {ended_session.total_duration / 60.0:.1f} 分钟")
+            print(f"相关网站: {ended_session.relevant_websites} 次")
+            print(f"无关网站: {ended_session.irrelevant_websites} 次")
+            print(f"专注度分数: {ended_session.focus_score:.1f}/100")
+            
+            # 分数评级
+            if ended_session.focus_score >= 90:
+                grade = "🌟 优秀"
+            elif ended_session.focus_score >= 80:
+                grade = "👍 良好"
+            elif ended_session.focus_score >= 70:
+                grade = "👌 一般"
+            elif ended_session.focus_score >= 60:
+                grade = "⚠️ 需要改进"
+            else:
+                grade = "❌ 需要大幅改进"
+            
+            print(f"评级: {grade}")
+            print("=" * 70 + "\n")
+            
+            # 清除当前任务
+            self.current_task = None
+            self.session_start_time = None
+            
+            return {
+                "task_name": ended_session.task_name,
+                "duration_minutes": ended_session.total_duration / 60.0,
+                "focus_score": ended_session.focus_score,
+                "relevant_websites": ended_session.relevant_websites,
+                "irrelevant_websites": ended_session.irrelevant_websites,
+                "grade": grade
+            }
+        
+        return None
+    
+    def get_current_focus_info(self):
+        """获取当前专注信息"""
+        if not self.current_task:
+            return None
+        
+        session_info = self.focus_calculator.get_current_session_info()
+        if session_info:
+            return {
+                "task_name": self.current_task,
+                "duration_minutes": session_info["duration_minutes"],
+                "current_focus_score": session_info["current_focus_score"],
+                "relevant_websites": session_info["relevant_websites"],
+                "irrelevant_websites": session_info["irrelevant_websites"]
+            }
+        return None
+    
     def print_statistics(self):
         """打印统计信息"""
         if not self.check_history:
@@ -231,7 +321,22 @@ class TaskFocusMonitor:
         print(f"检查网站总数: {total}")
         print(f"相关网站: {relevant} ({relevant/total*100:.1f}%)")
         print(f"无关网站: {irrelevant} ({irrelevant/total*100:.1f}%)")
+        
+        # 显示当前专注信息
+        focus_info = self.get_current_focus_info()
+        if focus_info:
+            print(f"当前专注时长: {focus_info['duration_minutes']:.1f} 分钟")
+            print(f"当前专注度分数: {focus_info['current_focus_score']:.1f}/100")
+        
         print("=" * 70 + "\n")
+    
+    def print_focus_history(self, days=30):
+        """打印专注度历史记录"""
+        self.focus_calculator.print_focus_metrics(days)
+    
+    def get_focus_history(self, limit=10):
+        """获取专注度历史记录"""
+        return self.focus_calculator.get_session_history(limit)
     
     def check_from_flowstate(self, task_data, website_data):
         """
@@ -320,7 +425,13 @@ def main():
     
     # 第二步：循环检查网站
     print("第二步：现在可以输入要打开的网站URL进行检查")
-    print("提示：输入 'quit' 退出，输入 'stats' 查看统计，输入 'new' 设置新任务\n")
+    print("提示：")
+    print("  - 输入网站URL进行检查")
+    print("  - 输入 'quit' 退出")
+    print("  - 输入 'end' 结束当前任务并查看专注度")
+    print("  - 输入 'stats' 查看当前统计")
+    print("  - 输入 'history' 查看专注度历史")
+    print("  - 输入 'new' 设置新任务\n")
     
     while True:
         website_url = input("请输入网站URL (或命令): ").strip()
@@ -331,6 +442,11 @@ def main():
         # 处理命令
         if website_url.lower() == 'quit':
             print("\n感谢使用！")
+            # 如果有活跃任务，询问是否结束
+            if monitor.current_task:
+                end_task = input("是否结束当前任务并查看专注度？(y/n): ").strip().lower()
+                if end_task == 'y':
+                    monitor.end_task()
             # 保存历史记录
             if monitor.check_history:
                 save = input("是否保存检查历史？(y/n): ").strip().lower()
@@ -338,8 +454,19 @@ def main():
                     monitor.save_history()
             break
         
+        elif website_url.lower() == 'end':
+            if monitor.current_task:
+                monitor.end_task()
+            else:
+                print("❌ 没有活跃的任务")
+            continue
+        
         elif website_url.lower() == 'stats':
             monitor.print_statistics()
+            continue
+        
+        elif website_url.lower() == 'history':
+            monitor.print_focus_history()
             continue
         
         elif website_url.lower() == 'new':
