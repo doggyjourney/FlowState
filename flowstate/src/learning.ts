@@ -1,4 +1,4 @@
-import { FocusEvent, Resource } from './types.js';
+import { FocusEvent, Resource, DistractionAnalysis, DistractionDetector } from './types.js';
 
 export interface SystemController {
   openApp(appId: string): Promise<void>;
@@ -46,11 +46,13 @@ export function canonicalizeUrl(url: string): string {
 export class LearningSession {
   private stop?: () => void;
   private seen = new Map<string, Resource>();
+  private startTime?: number;
 
   constructor(private sys: SystemController) {}
 
   start() {
     this.stop?.();
+    this.startTime = Date.now();
     this.stop = this.sys.subscribeActiveWindow((e) => {
       this.see({ kind: 'app', id: e.appId, title: e.title });
       if (e.url) this.see({ kind: 'url', id: canonicalizeUrl(e.url), title: e.title });
@@ -66,6 +68,14 @@ export class LearningSession {
     this.stop?.();
     this.stop = undefined;
     return Array.from(this.seen.values());
+  }
+
+  getDuration(): number {
+    return this.startTime ? Date.now() - this.startTime : 0;
+  }
+
+  getResourceCount(): number {
+    return this.seen.size;
   }
 }
 
