@@ -35,4 +35,7 @@ agent 实现了  超过60秒未发送或前台软件发生变化时        将�
 server  实现了  （若无注入API高级判断）朴素关键词判断前台应用是否属于黑名单；直接执行关闭软件的指令
         待实现  用注释标注待接入API（gemini/Groq）的地方以高级判断的标准
 
+//XYavecasdf
+实现了利用groq api进行website checking 的功能；
 
+下一步改进输入方式，input为读取从浏览器打开的网页，output对应关闭网页的操作
