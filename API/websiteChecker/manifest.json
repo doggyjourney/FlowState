@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "FlowState Website Logger",
+  "version": "0.2.0",
+  "description": "Send active tab URL/title to local FlowState Website Checker API and act on relevance.",
+  "permissions": ["tabs", "webNavigation", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "FlowState Website Logger"
+  }
+}
