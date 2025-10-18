@@ -1,0 +1,13 @@
+{
+  "name": "flowstate-agent-final",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "active-win": "^8.0.0",
+    "node-fetch": "^2.6.7",
+    "dotenv": "^16.0.3"
+  }
+}
