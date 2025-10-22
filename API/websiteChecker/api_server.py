@@ -20,8 +20,8 @@ try:
 except Exception:
     _has_cors = False
 
-# 硬编码 GROQ API Key（按你的要求）
-os.environ["GROQ_API_KEY"] = "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"
+
+os.environ["GROQ_API_KEY"] = "type in your own key"
 
 from task_focus_monitor import TaskFocusMonitor
 from flowstate_bridge import FlowStateBridge
