@@ -12,8 +12,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# 硬编码 GROQ API Key（按你的要求）
-os.environ["GROQ_API_KEY"] = "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"
+
+os.environ["GROQ_API_KEY"] = "type in your own key"
 
 # 导入我们的模块
 from flowstate_bridge import FlowStateBridge
