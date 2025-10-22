@@ -12,7 +12,7 @@ from focus_score_calculator import FocusScoreCalculator
 from flowstate_bridge import FlowStateBridge
 
 # 硬编码 GROQ API Key（按你的要求）
-GROQ_HARDCODED_KEY = "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"
+GROQ_HARDCODED_KEY = "Type in your own key"
 os.environ["GROQ_API_KEY"] = GROQ_HARDCODED_KEY
 
 
