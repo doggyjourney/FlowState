@@ -6,8 +6,8 @@ Web界面版任务专注度监控 - 使用 Flask
 import os
 from flask import Flask, render_template_string, request, jsonify
 
-# 硬编码 GROQ API Key（按你的要求）
-os.environ["GROQ_API_KEY"] = "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"
+
+os.environ["GROQ_API_KEY"] = "type in your own key"
 
 from task_focus_monitor import TaskFocusMonitor
 
